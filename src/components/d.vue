@@ -23,16 +23,17 @@
         </van-swipe-cell>
       </div> -->
       <van-collapse class="punchRecord" v-model="activeNames" v-if="timeArray.length > 0">
-            <van-collapse-item v-for="(item, index) in zongSJ.years" :title="item + '年'" :name="index" :key="'Y'+index">
+            <van-collapse-item v-for="(item, index) in zongSJ.years" :title="item + '年'" :name="item" :key="'Y'+index">
                     <van-collapse v-model="a">
-                      <van-collapse-item v-for="(item3, index3) in zongSJ.shuju[item]['mon']" :title="item3 +'月份'" :name="item+index3" :key="item+index3">
+                      <van-collapse-item v-for="(item3, index3) in zongSJ.shuju[item]['mon']" :title="item3 +'月份'" :name="item+item3" :key="item+index3">
                         <van-swipe-cell :right-width="65" v-for="(item2, index2) in zongSJ.shuju[item][item3]" :key="'E'+index2" :class="new Date().format('MM') == item3 && index2 == 0 && show == true ? 'toShow' : ''">
                             <span class="xinqi">{{item2.xinQi}}</span>
                             <ul class="time">
                                 <li>打卡时间：{{item2.statrtTime}}</li>
                                 <li>下班时间：{{item2.endTimes}}</li>
                             </ul>
-                            <span class="delete" slot="right" @click="delet(index)">删除记录</span>
+                            <span class="delete" slot="right" @click="delet(index)">删除</span>
+                            <div class="delete" slot="right" @click="clipboardSuccesss(item2.statrtTime, item2.endTimes)" v-clipboard:success="clipboardSuccess"  v-clipboard:copy='inputData'>复制</div>
                         </van-swipe-cell>
                       </van-collapse-item>
                     </van-collapse>
@@ -49,16 +50,19 @@
 import { endtime } from "../util/workTime";
 import router from "../router";
 import { superAdmin } from "../router";
-import { SwipeCell, Notify, Dialog, Collapse, CollapseItem} from "vant";
+import { SwipeCell, Notify, Dialog, Collapse, CollapseItem, Toast } from "vant";
 import {p} from '../util/shuju'
+import clip from '../util/clipboard' // use clipboard directly 
+import clipboard from '../directive/clipboard' // use clipboard by v-directive
 export default {
   data() {
     return {
-      activeNames: [0],//当前打开的面板
-      a: [0],
+      activeNames: [new Date().format('yyyy')],//当前打开的面板
+      a: [new Date().format('yyyy')+new Date().format('MM')],
       show: false,//闪耀文字的动画
       times: null,
       end: null,
+      inputData: '',
       timeArray: [],//未整理的数据
       zongSJ: [],//整理好的显示数据
       actor: "",//待显示的字段
@@ -68,13 +72,26 @@ export default {
       content: ['Hello！', '欢迎您回来！', '这里是您的打卡记录', '您可想死我了 T _ T', '常到这里看看哟$ _$', '千万不要迟到哦~~']//待显示的文案数组
     };
   },
+  directives: {
+      clipboard
+  },
   components: {
     "van-swipe-cell": SwipeCell,
     "van-collapse": Collapse,
     "van-collapse-item": CollapseItem,
-    Dialog
+    Dialog,
+    Toast 
   },
   methods: {
+    clipboardSuccess() {
+      Toast({
+        message: '复制成功',
+        duration: 1000
+      });
+    },
+    clipboardSuccesss(start, end){
+        this.inputData = `打卡时间：${start} 下班时间：${end}`
+    },
     getData() {// 准备待显示的文案
         // if (this.count < this.content.length - 1) { // 这里是按顺序显示
         //     this.count++
@@ -338,11 +355,18 @@ ul {
   font-size: 14px;
 }
 .delete {
-  width: 80px;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-  font-size: 12px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 12px;
+    display: inline-block;
+    background: red;
+    margin-right: 2px;
+    border-radius: 6px;
+}
+.delete:last-child{
+  background: green;
 }
 .van-swipe-cell {
   width: 90%;
@@ -359,7 +383,7 @@ ul {
   height: 100%;
   position: absolute;
   line-height: 40px;
-  background: red;
+  /* background: red; */
   color: #fff;
   padding: 0 4px;
   box-sizing: border-box;

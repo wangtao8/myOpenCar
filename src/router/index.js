@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import a from '../components/a'
 import b from '../components/b'
 import d from '../components/d'
+import e from '../components/e'
 import vnode from '../components/vnode'
 import danlie from '../components/danlie'
 import danlie2 from '../components/danlie2'
@@ -18,6 +19,16 @@ export const oldRouter = [//不需要权限的路由
     path: '/danlie2',
     name: 'danlie2',
     component: danlie2
+  },
+  {
+    path: '/vnode',
+    name: 'vnode',
+    component: vnode
+  },
+  {
+    path: '/danlie',
+    name: 'danlie',
+    component: danlie
   }
 ]
 
@@ -31,16 +42,6 @@ export const superAdmin = [//需要权限的路由
     path: '/b',
     name: 'b',
     component: b
-  },
-  {
-    path: '/vnode',
-    name: 'vnode',
-    component: vnode
-  },
-  {
-    path: '/danlie',
-    name: 'danlie',
-    component: danlie
   }
 ]
 
